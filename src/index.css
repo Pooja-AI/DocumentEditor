@@ -1,0 +1,90 @@
+/* Theme: white + Vanguard red */
+:root {
+  --red: #9a0718;
+  --red-dark: #7a0513;
+  --red-tint: #fbeff0;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #5f6368;
+  --color-text-tertiary: #8a8f98;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f7f7f8;
+  --color-background-tertiary: #f4f4f5;
+  --color-border-secondary: #d5d8dc;
+  --color-border-tertiary: #e3e5e8;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; background: var(--color-background-tertiary); }
+body { font-family: var(--font-sans); color: var(--color-text-primary); }
+
+/* Buttons */
+.cb-btn {
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid var(--color-border-secondary); background: #fff;
+  color: var(--color-text-primary); cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+  transition: background .15s, border-color .15s;
+}
+.cb-btn:hover:not(:disabled) { background: var(--color-background-secondary); border-color: var(--red); color: var(--red); }
+.cb-btn:disabled { opacity: .45; cursor: not-allowed; }
+.cb-btn-primary { background: var(--red); border-color: var(--red); color: #fff; }
+.cb-btn-primary:hover:not(:disabled) { background: var(--red-dark); border-color: var(--red-dark); color: #fff; }
+.cb-btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Header menu button */
+.cb-menu-btn {
+  width: 40px; height: 40px; min-width: 40px; border-radius: 8px; padding: 0; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.cb-menu-btn:hover { background: rgba(255,255,255,.22); }
+
+/* Form fields */
+.cb-field {
+  width: 100%; padding: 9px 12px; border-radius: 8px; font-size: 13px; outline: none;
+  border: 1px solid var(--color-border-secondary); background: #fff; color: var(--color-text-primary);
+  font-family: inherit;
+}
+.cb-field:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(154,7,24,.15); }
+
+/* Menu cards */
+.cb-card {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left;
+  padding: 12px 14px; border-radius: 10px; cursor: pointer; font-family: inherit;
+  border: 1px solid var(--color-border-tertiary); background: #fff; color: var(--color-text-primary);
+  transition: background .15s, border-color .15s;
+}
+.cb-card:hover { background: #fafafa; border-color: var(--color-border-secondary); }
+.cb-card.active { background: var(--red-tint); border-color: var(--red); }
+.cb-num {
+  width: 28px; height: 28px; min-width: 28px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 600; background: #eceef0; color: var(--color-text-secondary);
+}
+.cb-card.active .cb-num { background: var(--red); color: #fff; }
+
+/* Presentation portal */
+.cb-presenter {
+  display: flex; flex-direction: column; gap: 14px; background: #fff; overflow: hidden;
+  border: 1px solid var(--color-border-tertiary); border-radius: 12px; padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  height: calc(100vh - 112px); height: calc(100dvh - 112px); min-height: 560px;
+}
+.cb-presenter.cb-presenting {
+  position: fixed; inset: 0; z-index: 60; height: 100vh; height: 100dvh; min-height: 0;
+  border: none; border-radius: 0; padding: 16px 28px 18px; box-shadow: none;
+}
+.cb-viewer { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.cb-stage { flex: 1; min-height: 0; position: relative; background: #eceef0; border-radius: 8px; border: 1px solid var(--color-border-tertiary); overflow: hidden; }
+
+/* DOCX pages */
+.docx-host { height: 100%; overflow: auto; }
+.docx-host .docx-wrapper { background: transparent !important; padding: 16px !important; align-items: flex-start !important; }
+.docx-host .docx-wrapper > section.docx { margin: 0 auto 16px !important; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+
+@media (max-width: 750px) {
+  .cb-content { padding: 14px !important; }
+  .cb-presenter:not(.cb-presenting) { height: auto; min-height: 0; padding: 16px; }
+  .cb-presenter:not(.cb-presenting) .cb-viewer { flex: none; height: 72vh; }
+  .cb-hint { display: none !important; }
+}
