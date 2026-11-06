@@ -26,11 +26,21 @@ function Centered({ children, color }) {
   );
 }
 
-function PdfView({ url, outerRef }) {
+function PdfView({ url, outerRef, onKey }) {
+  // keys pressed while the PDF has focus don't reach the page, so forward them
+  const attach = (e) => {
+    try {
+      const win = e.target.contentWindow;
+      win?.addEventListener("keydown", (ev) => onKey?.(ev), true);
+    } catch {
+      /* cross-origin: nothing to attach */
+    }
+  };
   return (
     <div ref={outerRef} style={{ position: "absolute", inset: 0 }}>
       <iframe
         title="Document"
+        onLoad={attach}
         src={`${url}#view=FitH&navpanes=0`}
         style={{ width: "100%", height: "100%", border: "none", background: "#fff" }}
       />
@@ -115,7 +125,7 @@ function DocxView({ url, outerRef, scale, onFitScale }) {
   );
 }
 
-const DocumentViewer = forwardRef(function DocumentViewer({ file, title }, ref) {
+const DocumentViewer = forwardRef(function DocumentViewer({ file, title, onKey }, ref) {
   const [fit, setFit] = useState(true);
   const [fitScale, setFitScale] = useState(1);
   const [manual, setManual] = useState(1);
@@ -173,7 +183,7 @@ const DocumentViewer = forwardRef(function DocumentViewer({ file, title }, ref) 
       </div>
 
       <div className="cb-stage">
-        {ext === "pdf" && <PdfView url={file} outerRef={ref} />}
+        {ext === "pdf" && <PdfView url={file} outerRef={ref} onKey={onKey} />}
         {isDocx && <DocxView url={file} outerRef={ref} scale={scale} onFitScale={setFitScale} />}
         {!(ext === "pdf" || isDocx) && <Centered>Unsupported file type: .{ext}. Use PDF or DOCX.</Centered>}
       </div>

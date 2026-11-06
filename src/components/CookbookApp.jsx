@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import DocumentViewer from "./DocumentViewer";
 
 const RED = "#9A0718";
@@ -106,7 +106,7 @@ function Sidebar({ recipes, categories, selected, onSelect, category, setCategor
         style={{ marginBottom: 14 }}
       />
 
-      {categories.length > 2 && (
+      {categories.length > 1 && (
         <select
           className="cb-field"
           value={category}
@@ -115,7 +115,7 @@ function Sidebar({ recipes, categories, selected, onSelect, category, setCategor
           style={{ marginBottom: 14, cursor: "pointer" }}
         >
           {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{c === "All" ? "All categories" : c}</option>
           ))}
         </select>
       )}
@@ -214,37 +214,39 @@ function Presenter({ recipe, recipeList, onSelect }) {
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
-  // keyboard: ← → switch, ↑ ↓ scroll, F present, Esc exit
-  useEffect(() => {
-    const onKey = (e) => {
-      const el = document.activeElement;
-      const tag = el?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el?.isContentEditable) return;
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
+  // keyboard: ← → (and PageUp/PageDown) switch, ↑ ↓ scroll, F present, Esc exit
+  const keyRef = useRef(null);
+  keyRef.current = (e) => {
+    const el = document.activeElement;
+    const tag = el?.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el?.isContentEditable) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      if (e.key === "ArrowLeft") {
+    if (e.key === "ArrowLeft" || e.key === "PageUp") {
+      e.preventDefault();
+      goPrev();
+    } else if (e.key === "ArrowRight" || e.key === "PageDown") {
+      e.preventDefault();
+      goNext();
+    } else if (e.key === "f" || e.key === "F") {
+      e.preventDefault();
+      presenting ? stopPresenting() : startPresenting();
+    } else if (e.key === "Escape" && presenting) {
+      stopPresenting();
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      const pane = scrollRef.current;
+      if (pane && pane.scrollHeight > pane.clientHeight) {
         e.preventDefault();
-        goPrev();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        goNext();
-      } else if (e.key === "f" || e.key === "F") {
-        e.preventDefault();
-        presenting ? stopPresenting() : startPresenting();
-      } else if (e.key === "Escape" && presenting) {
-        stopPresenting();
-      } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-        const pane = scrollRef.current;
-        if (pane && pane.scrollHeight > pane.clientHeight) {
-          e.preventDefault();
-          pane.scrollBy({ top: e.key === "ArrowDown" ? 100 : -100, behavior: "smooth" });
-        }
+        pane.scrollBy({ top: e.key === "ArrowDown" ? 100 : -100, behavior: "smooth" });
       }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, presenting]);
+    }
+  };
+  const forwardKey = useCallback((e) => keyRef.current?.(e), []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", forwardKey, true); // capture phase
+    return () => window.removeEventListener("keydown", forwardKey, true);
+  }, [forwardKey]);
 
   return (
     <div ref={rootRef} className={`cb-presenter${presenting ? " cb-presenting" : ""}`}>
@@ -308,7 +310,7 @@ function Presenter({ recipe, recipeList, onSelect }) {
       </div>
 
       {/* DOCUMENT */}
-      <DocumentViewer key={recipe.id} ref={scrollRef} file={recipe.concept} title={recipe.title} />
+      <DocumentViewer key={recipe.id} ref={scrollRef} file={recipe.concept} title={recipe.title} onKey={forwardKey} />
 
       {/* FOOTER NAV */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
