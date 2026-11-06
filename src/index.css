@@ -35,10 +35,10 @@ body { font-family: var(--font-sans); color: var(--color-text-primary); }
 /* Header menu button */
 .cb-menu-btn {
   width: 40px; height: 40px; min-width: 40px; border-radius: 8px; padding: 0; cursor: pointer;
-  border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.4); background: #9a0718;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
 }
-.cb-menu-btn:hover { background: rgba(255,255,255,.22); }
+.cb-menu-btn:hover { background: rgba(199, 21, 21, 0.22); }
 
 /* Form fields */
 .cb-field {
